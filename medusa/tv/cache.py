@@ -224,7 +224,7 @@ class Cache(object):
 
         try:
             data = self._get_rss_data()
-            if self._check_auth(data):
+            if self._check_auth(data) and len(data['entries'] or []) > 0:
                 # clear cache
                 self._clear_cache()
 
