@@ -2711,15 +2711,14 @@ class Series(TV):
             for episode in episodes
         ]
 
-        if all(wanted_episodes):
-            log.info('Episodes {eps} of season {sea} are needed with this quality for {show}',
-                     {'eps': episodes, 'sea': season, 'show': self.name})
-            return True
-
-        elif not any(wanted_episodes):
+        if not any(wanted_episodes):
             log.debug('No episodes {eps} of season {sea} are needed with this quality for {show}',
                       {'eps': episodes, 'sea': season, 'show': self.name})
             return False
+        elif all(wanted_episodes):
+            log.info('Episodes {eps} of season {sea} are needed with this quality for {show}',
+                     {'eps': episodes, 'sea': season, 'show': self.name})
+            return True
         else:
             # If there are 2 candidates and only one is wanted it
             # is likely a single episode released as multi episode
