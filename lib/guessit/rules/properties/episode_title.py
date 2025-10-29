@@ -139,7 +139,8 @@ class EpisodeTitleFromPosition(TitleBaseRule):
 
         crc32 = matches.named('crc32')
 
-        return episode or crc32
+        # return episode or crc32
+        return episode
 
     def filepart_filter(self, filepart, matches):
         # Filepart where title was found.
