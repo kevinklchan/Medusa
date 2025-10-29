@@ -11,6 +11,8 @@ import re
 
 from bencodepy import DEFAULT as BENCODE
 
+from requests.adapters import HTTPAdapter
+
 from medusa import (
     app,
     helpers,
@@ -52,10 +54,12 @@ class TorrentRssProvider(TorrentProvider):
         self.required_cookies = ('uid', 'pass')
         self.title_tag = title_tag or 'title'
 
+        self.session.mount('https://', HTTPAdapter(max_retries=3))
+
         # Torrent Stats
 
         # Cache
-        self.cache = TorrentRssCache(self, min_time=15)
+        self.cache = TorrentRssCache(self, min_time=5)
 
     def _get_title_and_url(self, item):
         """Get title and url from result."""

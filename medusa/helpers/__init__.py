@@ -1493,18 +1493,19 @@ def get_image_size(image_path):
         head = f.read(24)
         if len(head) != 24:
             return
-        if imghdr.what(image_path) == 'png':
+        what = imghdr.what(None, head)
+        if what == 'png':
             check = struct.unpack('>i', head[4:8])[0]
             if check != 0x0d0a1a0a:
                 return
-            return struct.unpack('>ii', head[16:24])
-        elif imghdr.what(image_path) == 'gif':
-            return struct.unpack('<HH', head[6:10])
-        elif imghdr.what(image_path) == 'jpeg' or img_ext in ('jpg', 'jpeg'):
+            width, height = struct.unpack('>ii', head[16:24])
+        elif what == 'gif':
+            width, height = struct.unpack('<HH', head[6:10])
+        elif what == 'jpeg' or img_ext in ('jpg', 'jpeg'):
             f.seek(0)  # Read 0xff next
             size = 2
             ftype = 0
-            while not 0xc0 <= ftype <= 0xcf:
+            while not 0xc0 <= ftype <= 0xcf or ftype in (0xc4, 0xc8, 0xcc):
                 f.seek(size, 1)
                 byte = f.read(1)
                 while ord(byte) == 0xff:
@@ -1513,7 +1514,9 @@ def get_image_size(image_path):
                 size = struct.unpack('>H', f.read(2))[0] - 2
             # We are at a SOFn block
             f.seek(1, 1)  # Skip `precision' byte.
-            return struct.unpack('>HH', f.read(4))
+            height, width = struct.unpack('>HH', f.read(4))
+
+        return height, width
 
 
 def remove_folder(folder_path, level=logging.WARNING):
