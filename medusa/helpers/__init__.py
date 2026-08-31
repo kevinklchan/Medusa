@@ -1509,7 +1509,7 @@ def get_image_size(image_path):
             f.seek(0)
             size = 2
             ftype = 0
-            while not 0xc0 <= ftype <= 0xcf or ftype in {0xc4, 0xc8, 0xcc}:
+            while True:
                 f.seek(size, 1)
                 byte = f.read(1)
                 if not byte:

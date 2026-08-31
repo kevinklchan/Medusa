@@ -97,14 +97,15 @@ class EpisodeUpdater(object):
 
             cur_ep = series_obj.get_episode(db_episode['season'], db_episode['episode'])
 
-            # This is how you assure it is always converted to local time
-            show_air_time = parse_date_time(db_episode['airdate'], series_obj.airs, series_obj.network) if series_obj.airs else parse_date_time(db_episode['airdate'], '0:00 AM')
-            end_time = show_air_time.astimezone(app_timezone) + timedelta(minutes=try_int(series_obj.runtime, 60))
+            if series_obj.airs and series_obj.network:
+                # This is how you assure it is always converted to local time
+                show_air_time = parse_date_time(db_episode['airdate'], series_obj.airs, series_obj.network)
+                end_time = show_air_time.astimezone(app_timezone) + timedelta(minutes=try_int(series_obj.runtime, 60))
 
-            if series_obj.airdate_offset != 0:
-                log.debug(
-                    '{show}: Applying an airdate offset for the episode: {episode} of {offset} hours',
-                    {'show': series_obj.name, 'episode': cur_ep.pretty_name(), 'offset': series_obj.airdate_offset})
+                if series_obj.airdate_offset != 0:
+                    log.debug(
+                        '{show}: Applying an airdate offset for the episode: {episode} of {offset} hours',
+                        {'show': series_obj.name, 'episode': cur_ep.pretty_name(), 'offset': series_obj.airdate_offset})
 
                 # filter out any episodes that haven't finished airing yet
                 if end_time + timedelta(hours=series_obj.airdate_offset) > cur_time:
